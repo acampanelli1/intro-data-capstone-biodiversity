@@ -1,0 +1,359 @@
+﻿#Authored by Anna Campanelli 04/10/2018
+
+
+import codecademylib
+import pandas as pd
+#Step 1.1
+from matplotlib import pyplot as plt
+
+
+#Step 1.2
+species = pd.read_csv('species_info.csv')
+
+
+#Step 1.3
+print (species.head())
+
+
+#Step 2.1
+species_count = species.scientific_name.nunique()
+print "Number of unique species", species_count
+
+
+#Step 2.2
+species_type = species.category.unique()
+print "Unique Species Types", species_type
+
+
+#Step 2.3
+conservation_status = species.conservation_status.unique()
+print "Unique Conservation Status", conservation_status
+
+
+#Step 3.1
+conservation_counts = species.groupby('conservation_status').scientific_name.nunique().reset_index()
+
+
+#Step 3.2
+print conservation_counts
+
+
+#Step 4.1
+species.fillna('No Intervention', inplace = True)
+
+
+#Step 4.2
+conservation_counts_fixed = species.groupby('conservation_status').scientific_name.nunique().reset_index()
+
+
+print conservation_counts_fixed
+
+
+full_count = len(species.index)
+print full_count
+
+
+#Step 5
+
+
+species = pd.read_csv('species_info.csv')
+
+
+#Additional Work
+protection_counts1 = species.groupby('conservation_status')\
+    .scientific_name.nunique().reset_index()\
+    .sort_values(by='scientific_name')
+
+
+protection_counts1['Percent of total'] = (protection_counts1.scientific_name / float(protection_counts1.scientific_name.sum())) *100
+
+
+print protection_counts1
+
+
+
+
+#Additional Work
+
+
+plt.figure(figsize = (10,4))
+plt.bar(range(len(protection_counts1)),protection_counts1.scientific_name.values)
+ax = plt.subplot()
+ax.set_xticks(range(len(protection_counts1)))
+ax.set_xticklabels(protection_counts1.conservation_status.values)
+
+
+plt.xlabel('Conservation Status')
+plt.ylabel('Number of Species')
+plt.title('Conservation Status by Species')
+plt.show()
+
+
+
+
+
+
+
+
+species.fillna('No Intervention', inplace = True)
+
+
+
+
+#Step 5.1
+protection_counts = species.groupby('conservation_status')\
+    .scientific_name.nunique().reset_index()\
+    .sort_values(by='scientific_name')
+
+
+protection_counts['Percent of total'] = (protection_counts.scientific_name / float(protection_counts.scientific_name.sum())) *100
+
+
+print protection_counts
+
+
+
+
+#Step 5.2
+
+
+plt.figure(figsize = (10,4))
+plt.bar(range(len(protection_counts)),protection_counts.scientific_name.values)
+ax = plt.subplot()
+ax.set_xticks(range(len(protection_counts)))
+ax.set_xticklabels(protection_counts.conservation_status.values)
+
+
+plt.xlabel('Conservation Status')
+plt.ylabel('Number of Species')
+plt.title('Conservation Status by Species')
+plt.show()
+
+
+#Step 6.1
+species['is_protected'] = species.conservation_status != 'No Intervention'
+
+
+#Step 6.2
+category_counts = species.groupby(['category', 'is_protected']).scientific_name.nunique().reset_index()
+
+
+#Step 6.3
+#print category_counts.head()
+
+
+##Step 6.4
+category_pivot = category_counts.pivot(columns='is_protected',
+                      index='category',
+                      values='scientific_name')\
+                      .reset_index()
+#Step 7.1  
+category_pivot.columns =  ['category', 'not_protected','protected']
+
+
+
+
+#Step 7.2
+category_pivot['percent_protected'] = category_pivot.protected/(category_pivot.protected + category_pivot.not_protected)
+
+
+#Step 7.3
+print category_pivot
+
+
+
+
+#Step 8.2
+from scipy.stats import chi2_contingency
+
+
+#Step 8.1
+contingency = [[30, 146],
+              [75, 413]]
+#Step 8.3
+pval = chi2_contingency(contingency)[1]
+print(pval)
+
+
+#Step 8.4
+contingency_reptile_mammal = [[30, 146],
+                              [5, 73]]
+
+
+pval_reptile_mammal = chi2_contingency(contingency_reptile_mammal)[1]
+print(pval_reptile_mammal)
+
+
+contingency_amphibian_mammal = [[30, 146],
+                              [7, 72]]
+pval_amphibian_mammal = chi2_contingency(contingency_amphibian_mammal)[1]
+
+
+print(pval_amphibian_mammal)
+
+
+contingency_fish_mammal = [[30, 146],
+                              [11, 115]]
+pval_fish_mammal = chi2_contingency(contingency_fish_mammal)[1]
+
+
+print(pval_fish_mammal)
+
+
+contingency_v_mammal = [[30, 146],
+                              [46, 4216]]
+pval_v_mammal = chi2_contingency(contingency_v_mammal)[1]
+
+
+print(pval_v_mammal)
+
+
+contingency_nv_mammal = [[30, 146],
+                              [5, 328]]
+pval_nv_mammal = chi2_contingency(contingency_nv_mammal)[1]
+
+
+print(pval_nv_mammal)
+
+
+
+
+
+
+
+
+
+
+contingency_reptile_amph = [[7, 72],
+                              [5, 73]]
+pval_reptile_amph = chi2_contingency(contingency_reptile_amph)[1]
+print(pval_reptile_amph)
+
+
+contingency_reptile_b = [[75, 413],
+                              [5, 73]]
+pval_reptile_b = chi2_contingency(contingency_reptile_b)[1]
+print(pval_reptile_b)
+
+
+contingency_reptile_f = [[11, 115],
+                              [5, 73]]
+pval_reptile_f = chi2_contingency(contingency_reptile_f)[1]
+print(pval_reptile_f)
+
+
+
+
+species = pd.read_csv('species_info.csv')
+species.fillna('No Intervention', inplace = True)
+species['is_protected'] = species.conservation_status != 'No Intervention'
+#Step 10.1
+observations = pd.read_csv('observations.csv')
+
+
+#Step 10.2
+print (observations.head())
+
+
+#Step 11.1
+species['is_sheep'] = species.common_names.apply(lambda x: 'Sheep' in x)
+
+
+#Step 11.2
+species_is_sheep = species[species.is_sheep]
+
+
+#Step 11.3
+print species_is_sheep
+
+
+#Step 11.4
+sheep_species = species[(species.is_sheep) & (species.category == 'Mammal')]
+
+
+#Step 11.5
+print sheep_species
+
+
+#Step 12.1
+sheep_observations = observations.merge(sheep_species)
+
+
+print sheep_observations
+
+
+obs_by_park = sheep_observations.groupby('park_name').observations.sum().reset_index()
+
+
+print obs_by_park
+
+
+
+
+species = pd.read_csv('species_info.csv')
+species['is_sheep'] = species.common_names.apply(lambda x: 'Sheep' in x)
+sheep_species = species[(species.is_sheep) & (species.category == 'Mammal')]
+
+
+observations = pd.read_csv('observations.csv')
+
+
+sheep_observations = observations.merge(sheep_species)
+
+
+obs_by_park = sheep_observations.groupby('park_name').observations.sum().reset_index()
+
+
+#Step 13.1
+plt.figure(figsize=(16, 4))
+ax = plt.subplot()
+plt.bar(range(len(obs_by_park)),
+        obs_by_park.observations.values)
+ax.set_xticks(range(len(obs_by_park)))
+ax.set_xticklabels(obs_by_park.park_name.values)
+plt.ylabel('Number of Observations')
+plt.title('Observations of Sheep per Week')
+plt.show()
+
+
+
+
+#Step 14.1
+baseline = .15
+
+
+#Step 14.2
+minimum_detectable_effect = 100 * 5 / 15
+
+
+print minimum_detectable_effect
+
+
+#Step 14.3
+sample_size_per_variant = 890
+
+
+#Step 14.4
+yellowstone_weeks_observing = (890)/float(507)
+print "Weeks at yellow", yellowstone_weeks_observing
+
+
+#Step 14.5
+bryce_weeks_observing = 890/float(250)
+
+
+print "Weeks at bryce", bryce_weeks_observing
+
+
+
+
+gsm_weeks_observing = 890/float(149)
+
+
+print "Weeks at Great Smoky", gsm_weeks_observing
+
+
+yosemite_weeks_observing = 890/float(282)
+
+
+print "Weeks at Yosemite", yosemite_weeks_observing
